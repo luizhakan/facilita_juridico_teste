@@ -1,30 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Modal from "../Modal/Modal";
-import Mapa from "../Mapa/Mapa";
+import ModalClientes from "../../ModalClientes/ModalClientes";
+import Mapa from "../../Mapa/Mapa";
 
 function ListaClientes() {
+  // Estados
   const [clientes, setClientes] = useState([]);
   const [filtro, setFiltro] = useState("");
-  const navigate = useNavigate();
-
   const [rota, setRota] = useState([]);
   const [showModal, setShowModal] = useState(false);
 
-  const handleCalculateRoute = async () => {
-    try {
-      const resposta = await fetch("http://localhost:5000/rota");
-      if (!resposta.ok) {
-        throw new Error(`Erro HTTP: ${resposta.status}`);
-      }
-      const rotaCalculada = await resposta.json();
-      setRota(rotaCalculada);
-      setShowModal(true);
-    } catch (err) {
-      console.error("Erro ao calcular rota:", err);
-    }
-  };
+  // Hook para navegação
+  const navigate = useNavigate();
 
+  // Efeito para buscar clientes
   useEffect(() => {
     const fetchClientes = async () => {
       try {
@@ -42,6 +31,22 @@ function ListaClientes() {
     fetchClientes();
   }, []);
 
+  // Função para calcular rota
+  const handleCalculateRoute = async () => {
+    try {
+      const resposta = await fetch("http://localhost:5000/rota");
+      if (!resposta.ok) {
+        throw new Error(`Erro HTTP: ${resposta.status}`);
+      }
+      const rotaCalculada = await resposta.json();
+      setRota(rotaCalculada);
+      setShowModal(true);
+    } catch (err) {
+      console.error("Erro ao calcular rota:", err);
+    }
+  };
+
+  // Função para deletar cliente
   const handleDelete = async (id) => {
     try {
       const resposta = await fetch(`http://localhost:5000/clientes/${id}`, {
@@ -56,6 +61,7 @@ function ListaClientes() {
     }
   };
 
+  // Filtro de clientes
   const clientesFiltrados = clientes.filter((cliente) =>
     cliente.nome.toLowerCase().includes(filtro.toLowerCase())
   );
@@ -114,16 +120,23 @@ function ListaClientes() {
       </button>
 
       {showModal && (
-        <Modal title="Rota de Visitas" onClose={() => setShowModal(false)}>
+        <ModalClientes title="Rota de Visitas" onClose={() => setShowModal(false)}>
           <Mapa rota={rota} />
-          <ul className="list-disc pl-5">
+          <ul
+            className="list-disc pl-5"
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setShowModal(false);
+              }
+            }}
+          >
             {rota.map((cliente, index) => (
               <li key={index} className="mb-2">
                 {`${cliente.nome} - Coordenadas: (${cliente.coordenada_x}, ${cliente.coordenada_y})`}
               </li>
             ))}
           </ul>
-        </Modal>
+        </ModalClientes>
       )}
     </div>
   );

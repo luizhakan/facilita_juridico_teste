@@ -1,7 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from './components/Home/Home';
-import ListaClientes from './components/Clientes/ListaClientes';
-import AdicionarClientes from './components/Clientes/AdicionarClientes';
+import Home from './Components/Home/Home';
+import ListaClientes from './Components/Clientes/ListaClientes/ListaClientes';
+import AdicionarClientes from './Components/Clientes/AdicionarClientes/AdicionarClientes';
 
 function App() {
   return (

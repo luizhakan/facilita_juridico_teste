@@ -3,20 +3,30 @@ import { useNavigate } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
 
 function AdicionarClientes() {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
-  const [telefone, setTelefone] = useState("");
-  const [endereco, setEndereco] = useState("");
-  const [sugestoes, setSugestoes] = useState([]);
-  const [coordenada_x, setCoordenada_x] = useState("");
-  const [coordenada_y, setCoordenada_y] = useState("");
-  const [disabled, setDisabled] = useState(false);
-  const navigate = useNavigate();
+  // State variables
+  const [nome, setNome] = useState(""); // Nome do cliente
+  const [email, setEmail] = useState(""); // Email do cliente
+  const [telefone, setTelefone] = useState(""); // Telefone do cliente
+  const [endereco, setEndereco] = useState(""); // Endereço do cliente
+  const [sugestoes, setSugestoes] = useState([]); // Sugestões de endereços
+  const [coordenada_x, setCoordenada_x] = useState(""); // Coordenada X do endereço selecionado
+  const [coordenada_y, setCoordenada_y] = useState(""); // Coordenada Y do endereço selecionado
+  const [disabled, setDisabled] = useState(false); // Indica se o botão de envio está desabilitado
+  const navigate = useNavigate(); // Função de navegação
+
+  // useEffect para ativar/desativar o botão de envio quando os campos são preenchidos
+  useEffect(() => {
+    ativarDesativarBotao();
+  }, [nome, email, telefone, endereco]);
+
+  // Função para atualizar o estado do nome
   const handleChangeNome = (e) => setNome(e.target.value);
 
+  // Função para atualizar o estado do email
+  const handleEmail = (e) => setEmail(e.target.value);
 
+  // Função para verificar se o email já existe
   const handleChangeEmail = (e) => {
-    // ao sair do campo de email, verificar no backend (http://localhost:5000/emails) se o email já existe. se sim, exibir um alerta de erro
     const verificarEmail = async () => {
       try {
         const resposta = await fetch("http://localhost:5000/emails");
@@ -37,62 +47,32 @@ function AdicionarClientes() {
     verificarEmail();
   };
 
-  const handleEmail = (e) => setEmail(e.target.value);
-
+  // Função para atualizar o estado do telefone
   const handleTelefone = (e) => setTelefone(e.target.value);
 
+  // Função para verificar se o telefone já existe
   const handleChangeTelefone = (e) => {
-    // ao sair do campo de telefone, verificar no backend (http://localhost:5000/telefones) se o telefone já existe. se sim, exibir um alerta de erro
     const verificarTelefone = async () => {
-        try {
-            const resposta = await fetch("http://localhost:5000/telefones");
-            if (!resposta.ok) {
-                throw new Error(`Erro HTTP: ${resposta.status}`);
-            }
-            const dados = await resposta.json();
-            const telefones = dados.map((telefone) => telefone.telefone);
-            if (telefones.includes(e.target.value)) {
-                alert("Já existe um cliente com este telefone");
-                setDisabled(true);
-            }
-        } catch (err) {
-            console.error("Erro ao buscar telefones:", err);
+      try {
+        const resposta = await fetch("http://localhost:5000/telefones");
+        if (!resposta.ok) {
+          throw new Error(`Erro HTTP: ${resposta.status}`);
         }
+        const dados = await resposta.json();
+        const telefones = dados.map((telefone) => telefone.telefone);
+        if (telefones.includes(e.target.value)) {
+          alert("Já existe um cliente com este telefone");
+          setDisabled(true);
+        }
+      } catch (err) {
+        console.error("Erro ao buscar telefones:", err);
+      }
     };
 
     verificarTelefone();
-    };
-
-  const buscarEndereco = async (valor) => {
-    const resposta = await fetch(
-      `https://nominatim.openstreetmap.org/search?format=json&q=${valor}`
-    );
-    const dados = await resposta.json();
-    setSugestoes(dados);
   };
 
-  const onSugestoesFetchRequested = ({ value }) => {
-    buscarEndereco(value);
-  };
-
-  const onSugestoesClearRequested = () => {
-    setSugestoes([]);
-  };
-
-  const getSugestaoValor = (sugestao) => {
-    return sugestao.display_name;
-  };
-
-  const renderSugestao = (sugestao) => {
-    return <span>{sugestao.display_name}</span>;
-  };
-
-  const onSugestaoSelected = (event, { suggestion }) => {
-    setEndereco(suggestion.display_name);
-    setCoordenada_x(suggestion.lat);
-    setCoordenada_y(suggestion.lon);
-  };
-
+  // Função para ativar/desativar o botão de envio
   const ativarDesativarBotao = () => {
     if (nome === "" || email === "" || telefone === "" || endereco === "") {
       setDisabled(true);
@@ -101,13 +81,41 @@ function AdicionarClientes() {
     }
   };
 
-  useEffect(() => {
-    ativarDesativarBotao();
-  }, [nome, email, telefone, endereco]);
+  // Função para buscar sugestões de endereços
+  const buscarEndereco = async (valor) => {
+    const resposta = await fetch(
+      `https://nominatim.openstreetmap.org/search?format=json&q=${valor}`
+    );
+    const dados = await resposta.json();
+    setSugestoes(dados);
+  };
 
+  // Função para buscar sugestões de endereços quando o usuário digita
+  const onSugestoesFetchRequested = ({ value }) => {
+    buscarEndereco(value);
+  };
+
+  // Função para limpar as sugestões de endereços
+  const onSugestoesClearRequested = () => {
+    setSugestoes([]);
+  };
+
+  // Função para obter o valor da sugestão de endereço
+  const getSugestaoValor = (sugestao) => sugestao.display_name;
+
+  // Função para renderizar a sugestão de endereço
+  const renderSugestao = (sugestao) => <span>{sugestao.display_name}</span>;
+
+  // Função para lidar com a seleção de uma sugestão de endereço
+  const onSugestaoSelected = (event, { suggestion }) => {
+    setEndereco(suggestion.display_name);
+    setCoordenada_x(suggestion.lat);
+    setCoordenada_y(suggestion.lon);
+  };
+
+  // Função para lidar com o envio do formulário
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const resposta = await fetch("http://localhost:5000/clientes", {
         method: "POST",
