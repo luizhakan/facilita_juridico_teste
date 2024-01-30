@@ -26,34 +26,32 @@ const getClientes = async (req, res) => {
 };
 
 const postClientes = async (req, res) => {
-  app.post("/clientes", async (req, res) => {
-    const { nome, email, telefone, coordenada_x, coordenada_y } = req.body;
-    try {
-      const client = await pool.connect();
-      const coordenadasXNum = parseFloat(coordenada_x);
-      const coordenadasYNum = parseFloat(coordenada_y);
+  const { nome, email, telefone, coordenada_x, coordenada_y } = req.body;
+  try {
+    const client = await pool.connect();
+    const coordenadasXNum = parseFloat(coordenada_x);
+    const coordenadasYNum = parseFloat(coordenada_y);
 
-      const resultEmail = await client.query(
-        "SELECT * FROM clientes WHERE email = $1",
-        [email]
+    const resultEmail = await client.query(
+      "SELECT * FROM clientes WHERE email = $1",
+      [email]
+    );
+
+    if (resultEmail.rows.length > 0) {
+      res.status(400).send("Já existe um cliente com esse email");
+    } else {
+      const result = await client.query(
+        "INSERT INTO clientes (nome, email, telefone, coordenada_x, coordenada_y) VALUES ($1, $2, $3, $4, $5) RETURNING *",
+        [nome, email, telefone, coordenadasXNum, coordenadasYNum]
       );
-
-      if (resultEmail.rows.length > 0) {
-        res.status(400).send("Já existe um cliente com esse email");
-      } else {
-        const result = await client.query(
-          "INSERT INTO clientes (nome, email, telefone, coordenada_x, coordenada_y) VALUES ($1, $2, $3, $4, $5) RETURNING *",
-          [nome, email, telefone, coordenadasXNum, coordenadasYNum]
-        );
-        res.json(result.rows[0]);
-      }
-
-      client.release();
-    } catch (err) {
-      console.error("Erro ao adicionar cliente:", err);
-      res.status(500).send("Erro ao adicionar cliente: " + err.message);
+      res.json(result.rows[0]);
     }
-  });
+
+    client.release();
+  } catch (err) {
+    console.error("Erro ao adicionar cliente:", err);
+    res.status(500).send("Erro ao adicionar cliente: " + err.message);
+  }
 };
 
 const getTelefones = async (req, res) => {

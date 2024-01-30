@@ -1,0 +1,37 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    ports:
+      - "5173:5173" # Porta do frontend
+      - "5000:5000" # Porta do backend
+    environment:
+      DB_USER: luizjuridico
+      DB_PASSWORD: senhajuridico
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_DATABASE: banco_facilita_juridico
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+    depends_on:
+      - db
+    networks:
+      - facilita_juridico_network
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: luizjuridico
+      POSTGRES_PASSWORD: senhajuridico
+      POSTGRES_DB: banco_facilita_juridico
+    ports:
+      - "5432:5432"
+    volumes:
+      - /var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - facilita_juridico_network
+
+networks:
+  facilita_juridico_network:
