@@ -27,6 +27,12 @@ Para construir e iniciar os containers utilizando Docker Compose, execute:
 ```bash
 docker-compose up --build
 ```
+Se não funcionar de primeira, tente rodar com permissões de administrador (windows) ou com sudo (linux).
+Exemplo: 
+```bash
+sudo docker-compose up --build
+```
+
 Este comando irá baixar as imagens necessárias, construir o projeto e iniciar os serviços definidos no docker-compose.yml, incluindo o backend, frontend e o banco de dados PostgreSQL.
 
 3. Acessar a Aplicação
