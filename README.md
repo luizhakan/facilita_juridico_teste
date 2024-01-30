@@ -8,6 +8,7 @@ Antes de mergulhar no projeto, certifique-se de ter instalado:
 
 - **Docker**: Uma plataforma de containerização essencial.
 - **Docker Compose**: Facilita a execução de aplicações multi-container Docker (Incluído no Docker Desktop para Windows e Mac).
+  https://www.docker.com/products/docker-desktop/
 
 ## Instruções de Instalação e Execução
 
