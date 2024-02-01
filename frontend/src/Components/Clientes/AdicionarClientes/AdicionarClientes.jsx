@@ -134,6 +134,8 @@ function AdicionarClientes() {
     } else {
       alert("Preencha todos os campos corretamente");
     }
+
+    navigate("/listaclientes");
   };
 
   useEffect(() => {
@@ -242,7 +244,7 @@ function AdicionarClientes() {
         <div className="flex justify-between mt-6">
           <button
             type="button"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
           >
             Voltar
