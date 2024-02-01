@@ -12,6 +12,8 @@ function AdicionarClientes() {
   const [coordenada_x, setCoordenada_x] = useState(""); // Coordenada X do endereço selecionado
   const [coordenada_y, setCoordenada_y] = useState(""); // Coordenada Y do endereço selecionado
   const [disabled, setDisabled] = useState(false); // Indica se o botão de envio está desabilitado
+  const [validEmail, setValidEmail] = useState(false); // Indica se os campos são válidos
+  const [validTelefone, setValidTelefone] = useState(false); // Indica se os campos são válidos
   const navigate = useNavigate(); // Função de navegação
 
   // useEffect para ativar/desativar o botão de envio quando os campos são preenchidos
@@ -25,51 +27,40 @@ function AdicionarClientes() {
   // Função para atualizar o estado do email
   const handleEmail = (e) => setEmail(e.target.value);
 
-  // Função para verificar se o email já existe
-  const handleChangeEmail = (e) => {
-    const verificarEmail = async () => {
-      try {
-        const resposta = await fetch("http://localhost:5000/emails");
-        if (!resposta.ok) {
-          throw new Error(`Erro HTTP: ${resposta.status}`);
-        }
+  // verifica se o email já existe e se está no formato correto, se sim, seta o estado de validação do email como true
+  const handleChangeEmail = async (e) => {
+    try {
+      const resposta = await fetch("http://localhost:5000/emails");
+      if (resposta.ok) {
         const dados = await resposta.json();
-        const emails = dados.map((email) => email.email);
-        if (emails.includes(e.target.value)) {
-          alert("Já existe um cliente com este email");
-          setDisabled(true);
+        if (dados.includes(e.target.value)) {
+          alert("Email já cadastrado");
+          setValidEmail(false);
+        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.target.value)) {
+          alert("Email inválido");
+          setValidEmail(false);
+        } else {
+          setValidEmail(true);
         }
-      } catch (err) {
-        console.error("Erro ao buscar emails:", err);
       }
-    };
-
-    verificarEmail();
+    } catch (err) {
+      console.error("Erro ao buscar emails:", err);
+    }
   };
 
-  // Função para atualizar o estado do telefone
-  const handleTelefone = (e) => setTelefone(e.target.value);
+  // Função para atualizar o estado do telefone, verificando se já existe e testar com regex de telefone no formato brasileiro. o aviso só deverá aparecer ao sair do campo
+  const handleTelefone = (e) => {
+    setTelefone(e.target.value);
+  };
 
-  // Função para verificar se o telefone já existe
   const handleChangeTelefone = (e) => {
-    const verificarTelefone = async () => {
-      try {
-        const resposta = await fetch("http://localhost:5000/telefones");
-        if (!resposta.ok) {
-          throw new Error(`Erro HTTP: ${resposta.status}`);
-        }
-        const dados = await resposta.json();
-        const telefones = dados.map((telefone) => telefone.telefone);
-        if (telefones.includes(e.target.value)) {
-          alert("Já existe um cliente com este telefone");
-          setDisabled(true);
-        }
-      } catch (err) {
-        console.error("Erro ao buscar telefones:", err);
-      }
-    };
-
-    verificarTelefone();
+    // regex para telefone no formato 99999999999
+    if (!/^\d{11}$/.test(e.target.value)) {
+      alert("Telefone inválido");
+      setValidTelefone(false);
+    } else {
+      setValidTelefone(true);
+    }
   };
 
   // Função para ativar/desativar o botão de envio
@@ -113,36 +104,52 @@ function AdicionarClientes() {
     setCoordenada_y(suggestion.lon);
   };
 
-  // Função para lidar com o envio do formulário
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const resposta = await fetch("http://localhost:5000/clientes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          nome,
-          email,
-          telefone,
-          endereco,
-          coordenada_x,
-          coordenada_y,
-        }),
-      });
-
-      if (resposta.status === 409) {
-        throw new Error("Já existe um cliente com este email");
-      } else if (!resposta.ok) {
-        throw new Error(`Erro HTTP: ${resposta.status}`);
-      } else {
-        navigate("/listaclientes");
+  // Função para lidar com o envio do formulário, mas antes verificar se o email e o telefone são válidos, e se todos os campos estão preenchidos
+  const handleSubmit = async () => {
+    if (validEmail && validTelefone) {
+      try {
+        const resposta = await fetch("http://localhost:5000/clientes", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            nome,
+            email,
+            telefone,
+            endereco,
+            coordenada_x,
+            coordenada_y,
+          }),
+        });
+        if (resposta.ok) {
+          alert("Cliente adicionado com sucesso");
+          navigate(-1);
+        } else {
+          alert("Erro ao adicionar cliente");
+        }
+      } catch (err) {
+        console.error("Erro ao adicionar cliente:", err);
       }
-    } catch (err) {
-      console.error("Erro ao adicionar cliente:", err);
+    } else {
+      alert("Preencha todos os campos corretamente");
     }
   };
+
+  useEffect(() => {
+    if (
+      !validEmail ||
+      !validTelefone ||
+      nome === "" ||
+      email === "" ||
+      telefone === "" ||
+      endereco === ""
+    ) {
+      setDisabled(true);
+    } else {
+      setDisabled(false);
+    }
+  }, [validEmail, validTelefone, nome, email, telefone, endereco]);
 
   return (
     <div className="container mx-auto p-4 max-w-lg">
@@ -193,6 +200,9 @@ function AdicionarClientes() {
             type="text"
             id="telefone"
             value={telefone}
+            maxLength={11}
+            max={11}
+            placeholder="99999999999"
             onBlur={handleChangeTelefone}
             onChange={handleTelefone} // Atualizado para usar a função handleChangeTelefone
             className="w-full p-2 border border-gray-300 rounded"
@@ -240,7 +250,11 @@ function AdicionarClientes() {
           <button
             disabled={disabled}
             onClick={handleSubmit}
-            className="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            className={
+              disabled
+                ? "bg-gray-300 py-2 px-4 rounded"
+                : "bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+            }
           >
             Adicionar
           </button>
