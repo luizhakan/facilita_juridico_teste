@@ -107,7 +107,7 @@ function ListaClientes() {
         </tbody>
       </table>
       <button
-        onClick={() => navigate(-1)}
+        onClick={() => navigate("/")}
         className="mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         Voltar
@@ -120,7 +120,10 @@ function ListaClientes() {
       </button>
 
       {showModal && (
-        <ModalClientes title="Rota de Visitas" onClose={() => setShowModal(false)}>
+        <ModalClientes
+          title="Rota de Visitas"
+          onClose={() => setShowModal(false)}
+        >
           <Mapa rota={rota} />
           <ul
             className="list-disc pl-5"
