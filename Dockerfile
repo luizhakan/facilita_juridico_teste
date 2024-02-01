@@ -1,6 +1,7 @@
+# Usando a imagem base do Node
 FROM node:20
 
-# Instalar o PostgreSQL
+# Instalar PostgreSQL
 RUN apt-get update && apt-get install -y postgresql postgresql-contrib
 
 # Configurar o ambiente do PostgreSQL
@@ -12,14 +13,17 @@ RUN /etc/init.d/postgresql start &&\
 # Mudar para o usuário root para instalar mais dependências
 USER root
 
-# Copiar e instalar dependências do backend
-WORKDIR /usr/src/app/backend
-COPY backend/package*.json ./
-RUN npm install
-
-# Copiar e instalar dependências do frontend
+# Instalar as dependências do frontend
 WORKDIR /usr/src/app/frontend
 COPY frontend/package*.json ./
+RUN npm install
+
+# Verificar a instalação do Vite
+RUN npx vite --version
+
+# Instalar as dependências do backend
+WORKDIR /usr/src/app/backend
+COPY backend/package*.json ./
 RUN npm install
 
 # Copiar o restante dos arquivos do projeto
@@ -30,4 +34,4 @@ COPY . .
 EXPOSE 5173 5000 52120
 
 # Comandos para iniciar o backend e o frontend
-CMD ["/bin/bash", "-c", "service postgresql start && npm start --prefix backend & npm start --prefix frontend"]
+CMD ["/bin/bash", "-c", "service postgresql start && cd /usr/src/app/backend && npm start & cd /usr/src/app/frontend && npm start"]

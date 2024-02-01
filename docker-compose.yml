@@ -13,7 +13,8 @@ services:
       DB_DATABASE: banco_facilita_juridico
     volumes:
       - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - /usr/src/app/frontend/node_modules
+      - /usr/src/app/backend/node_modules
     depends_on:
       - db
     networks:
