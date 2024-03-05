@@ -77,13 +77,20 @@ function AdicionarClientes() {
     const resposta = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${valor}`
     );
+
+    // verificar quantas requisições de API foram feitas
+    console.log("Requisições feitas:", resposta);
+
     const dados = await resposta.json();
     setSugestoes(dados);
   };
 
-  // Função para buscar sugestões de endereços quando o usuário digita
   const onSugestoesFetchRequested = ({ value }) => {
-    buscarEndereco(value);
+    if (value.length >= 4) {
+      setTimeout(() => {
+        buscarEndereco(value);
+      }, 2000)
+    }
   };
 
   // Função para limpar as sugestões de endereços
@@ -124,7 +131,7 @@ function AdicionarClientes() {
         });
         if (resposta.ok) {
           alert("Cliente adicionado com sucesso");
-          navigate(-1);
+          navigate('/listaclientes');
         } else {
           alert("Erro ao adicionar cliente");
         }
@@ -217,29 +224,28 @@ function AdicionarClientes() {
           Endereço:
         </label>
         <div className="relative w-full p-2 border border-gray-300 rounded">
-          <Autosuggest
-            // ... outras props
-            suggestions={sugestoes}
-            onSuggestionsFetchRequested={onSugestoesFetchRequested}
-            onSuggestionsClearRequested={onSugestoesClearRequested}
-            getSuggestionValue={getSugestaoValor}
-            renderSuggestion={renderSugestao}
-            inputProps={{
-              placeholder: "Digite um endereço",
-              value: endereco,
-              className: "w-full p-2",
-              onChange: (_, { newValue }) => setEndereco(newValue),
-            }}
-            theme={{
-              container: "w-full",
-              suggestion: "cursor-pointer",
-              suggestionsList:
-                "absolute z-10 bg-white shadow-lg max-h-60 overflow-auto",
-              suggestionsContainerOpen: "absolute w-full mt-1",
-              input: "w-full p-2 flex",
-            }}
-            onSuggestionSelected={onSugestaoSelected}
-          />
+        <Autosuggest
+          suggestions={sugestoes}
+          onSuggestionsFetchRequested={onSugestoesFetchRequested}
+          onSuggestionsClearRequested={onSugestoesClearRequested}
+          getSuggestionValue={getSugestaoValor}
+          renderSuggestion={renderSugestao}
+          theme={{
+            container: "flex flex-col w-full",
+            suggestionsContainer: "w-full",
+            suggestionsContainerOpen: "block",
+            suggestionsList: "w-full",
+          }}
+          autoFocus
+          inputProps={{
+            placeholder: "Digite um endereço",
+            value: endereco,
+            onChange: (_, { newValue }) => {
+              setEndereco(newValue)
+            },
+          }}
+          onSuggestionSelected={onSugestaoSelected}
+        />
         </div>
         <div className="flex justify-between mt-6">
           <button
