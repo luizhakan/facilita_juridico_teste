@@ -1,6 +1,13 @@
 const pool = require("../db/db");
 const calcularRota = require("../function/CalcularRota");
 
+/**
+ * Função assíncrona para interagir com o banco de dados de teste.
+ *
+ * @param {Object} req - o objeto de requisição
+ * @param {Object} res - o objeto de resposta
+ * @return {Promise} uma Promise que resolve com as linhas de resultado da consulta ou rejeita com uma mensagem de erro
+ */
 const testdb = async (req, res) => {
   try {
     const client = await pool.connect();
@@ -13,6 +20,13 @@ const testdb = async (req, res) => {
   }
 };
 
+/**
+ * Função assíncrona para obter a lista de clientes.
+ *
+ * @param {Object} req - O objeto de requisição
+ * @param {Object} res - O objeto de resposta
+ * @return {Promise} O resultado da operação assíncrona
+ */
 const getClientes = async (req, res) => {
   try {
     const client = await pool.connect();
@@ -25,6 +39,14 @@ const getClientes = async (req, res) => {
   }
 };
 
+/**
+ * Manipula a requisição POST para criar um novo cliente,
+ * verifica se o e-mail já existe e adiciona o cliente ao banco de dados.
+ *
+ * @param {Object} req - o objeto de requisição
+ * @param {Object} res - o objeto de resposta
+ * @return {Promise} uma Promise que resolve para o resultado da operação
+ */
 const postClientes = async (req, res) => {
   const { nome, email, telefone, coordenada_x, coordenada_y } = req.body;
   try {
@@ -54,6 +76,13 @@ const postClientes = async (req, res) => {
   }
 };
 
+/**
+ * Função assíncrona para recuperar números de telefone do banco de dados e enviar o resultado como JSON.
+ *
+ * @param {Object} req - O objeto de requisição
+ * @param {Object} res - O objeto de resposta
+ * @return {Promise<void>} O resultado da função como uma promise
+ */
 const getTelefones = async (req, res) => {
   try {
     const client = await pool.connect();
@@ -66,6 +95,13 @@ const getTelefones = async (req, res) => {
   }
 };
 
+/**
+ * Função assíncrona para recuperar os emails.
+ *
+ * @param {Object} req - o objeto de requisição
+ * @param {Object} res - o objeto de resposta
+ * @return {Promise} uma promise que resolve para os emails recuperados
+ */
 const getEmails = async (req, res) => {
   try {
     const client = await pool.connect();
@@ -78,6 +114,13 @@ const getEmails = async (req, res) => {
   }
 };
 
+/**
+ * Exclui um cliente do banco de dados com base no ID fornecido.
+ *
+ * @param {Object} req - o objeto de requisição
+ * @param {Object} res - o objeto de resposta
+ * @return {Promise} uma Promise que resolve para o resultado da exclusão
+ */
 const deleteClientes = async (req, res) => {
   const id = parseInt(req.params.id);
   try {
@@ -94,7 +137,14 @@ const deleteClientes = async (req, res) => {
   }
 };
 
-// faça uma requisição post onde eu recebo a localização da empresa para definir como o ponto inicial da rota, invés de adicionar no banco de dados, irá ser no localStorage do navegador
+
+ /**
+  * Função assíncrona para lidar com a solicitação de post para dados da empresa.
+  *
+  * @param {object} req - o objeto de solicitação
+  * @param {object} res - o objeto de resposta
+  * @return {Promise} uma Promise que resolve para a resposta JSON com coordenada_x e coordenada_y
+  */
 const postEmpresa = async (req, res) => {
   const { coordenada_x, coordenada_y } = req.body;
   try {
@@ -114,7 +164,13 @@ const postEmpresa = async (req, res) => {
   }
 };
 
-// Função assíncrona que obtém a rota dos clientes
+  /**
+   * Função assíncrona para obter a rota com base nas coordenadas válidas do cliente e enviá-la como resposta JSON.
+   *
+   * @param {Object} req - o objeto de requisição
+   * @param {Object} res - o objeto de resposta
+   * @return {Promise} uma Promise que é resolvida quando a rota é calculada com sucesso e enviada como resposta JSON, ou rejeitada com uma mensagem de erro
+   */
 const getRota = async (req, res) => {
   try {
     // Estabelece uma conexão com o banco de dados
