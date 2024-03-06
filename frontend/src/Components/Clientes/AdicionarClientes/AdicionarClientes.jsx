@@ -2,6 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Autosuggest from "react-autosuggest";
 
+
+/**
+ * Função para adicionar clientes ao sistema.
+ *
+ * @return {void} 
+ */
 function AdicionarClientes() {
   // State variables
   const [nome, setNome] = useState(""); // Nome do cliente
@@ -53,6 +59,12 @@ function AdicionarClientes() {
     setTelefone(e.target.value);
   };
 
+    /**
+     * Manipula a alteração do campo de telefone.
+     *
+     * @param {object} e - O objeto de evento
+     * @return {void} 
+     */
   const handleChangeTelefone = (e) => {
     // regex para telefone no formato 99999999999
     if (!/^\d{11}$/.test(e.target.value)) {
@@ -85,6 +97,11 @@ function AdicionarClientes() {
     setSugestoes(dados);
   };
 
+  /**
+   * Uma função que é chamada quando as sugestões são buscadas.
+   *
+   * @param {Object} value - o valor de entrada
+   */
   const onSugestoesFetchRequested = ({ value }) => {
     if (value.length >= 4) {
       setTimeout(() => {

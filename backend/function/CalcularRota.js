@@ -1,3 +1,9 @@
+/**
+ * Calcula a rota ótima para visitar todos os clientes com base em suas coordenadas.
+ *
+ * @param {array} clientes - A lista de clientes com suas coordenadas
+ * @return {array} A rota ótima para visitar todos os clientes
+ */
 function calcularRota(clientes) {
   if (clientes.length === 0) return []; // Verifica se a lista de clientes está vazia e retorna uma lista vazia caso verdadeiro
 

@@ -7,7 +7,12 @@ export default function LocalizacaoModal({ isOpen, onLocalizacaoSubmit }) {
   const [endereco, setEndereco] = useState("");
   const [sugestoes, setSugestoes] = useState([]);
 
-  // Buscar sugestões de endereços
+  /**
+   * Busca assíncrona de informações de endereço com base no valor fornecido.
+   *
+   * @param {type} valor - O valor para buscar informações de endereço.
+   * @return {type} undefined
+   */
   const buscarEndereco = async (valor) => {
     const resposta = await fetch(
       `https://nominatim.openstreetmap.org/search?format=json&q=${valor}`
@@ -20,12 +25,24 @@ export default function LocalizacaoModal({ isOpen, onLocalizacaoSubmit }) {
     setSugestoes(dados);
   };
 
+  /**
+   * Uma função para lidar com a solicitação de busca de sugestões.
+   *
+   * @param {Object} value - o valor de entrada para buscar sugestões
+   * @return {void} 
+   */
   const onSugestoesFetchRequested = ({ value }) => {
     if (value.length >= 4) {
       buscarEndereco(value);
     }
   };
 
+    /**
+     * Uma descrição da função inteira.
+     *
+     * @param {tipo} nomeDoParametro - descrição do parâmetro
+     * @return {tipo} descrição do valor de retorno
+     */
   const onSugestoesClearRequested = () => {
     setSugestoes([]);
   };
@@ -34,6 +51,13 @@ export default function LocalizacaoModal({ isOpen, onLocalizacaoSubmit }) {
 
   const renderSugestao = (sugestao) => <span>{sugestao.display_name}</span>;
 
+    /**
+     * Manipula a seleção de uma sugestão.
+     *
+     * @param {Evento} event - o objeto de evento
+     * @param {objeto} suggestion - o objeto de sugestão selecionado
+     * @return {void} 
+     */
   const onSugestaoSelected = (event, { suggestion }) => {
     setEndereco(suggestion.display_name);
     onLocalizacaoSubmit(suggestion.lat, suggestion.lon);
